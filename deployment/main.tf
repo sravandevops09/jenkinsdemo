@@ -12,7 +12,7 @@ data "aws_ami" "amazon_linux_2023" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-  owners = ["137112412989"]
+  owners = ["342374577013"]
 }
 
 resource "aws_instance" "my_ec2" {
