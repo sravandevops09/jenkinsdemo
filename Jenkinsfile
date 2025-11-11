@@ -15,25 +15,33 @@ pipeline {
 
         stage('Initialize Terraform') {
             steps {
-                sh 'terraform init'
+                dir('deployment') {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Validate Terraform') {
             steps {
-                sh 'terraform validate'
+                dir('deployment') {
+                    sh 'terraform validate'
+                }
             }
         }
 
         stage('Plan Terraform') {
             steps {
-                sh 'terraform plan -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
+                dir('deployment') {
+                    sh 'terraform plan -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
+                }
             }
         }
 
         stage('Apply Terraform') {
             steps {
-                sh 'terraform apply -auto-approve -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
+                dir('deployment') {
+                    sh 'terraform apply -auto-approve -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
+                }
             }
         }
     }
