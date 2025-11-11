@@ -1,29 +1,43 @@
-provider "aws" {
-  region = "us-east-1"
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 
+provider "aws" {
+  region = "us-east-1"  # change as needed
+}
+
+# 🔹 Fetch the latest Amazon Linux 2023 AMI dynamically
 data "aws_ami" "amazon_linux_2023" {
   most_recent = true
+  owners      = ["amazon"]
+
   filter {
     name   = "name"
     values = ["al2023-ami-*-x86_64"]
   }
+
   filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+    name   = "architecture"
+    values = ["x86_64"]
   }
-  owners = ["342374577013"]
+
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
 }
 
-resource "aws_instance" "my_ec2" {
+# 🔹 Create an EC2 instance using t3.micro
+resource "aws_instance" "terraform_demo" {
   ami           = data.aws_ami.amazon_linux_2023.id
   instance_type = "t3.micro"
 
   tags = {
-    Name = "AmazonLinux2023EC2"
+    Name = "TerraformDemoInstance"
   }
-}
-
-output "ami_id_used" {
-  value = data.aws_ami.amazon_linux_2023.id
 }
