@@ -6,12 +6,12 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('SecretKey')     // Jenkins credentials ID
     }
 
-    stage('Checkout Code') {
-    steps {
-        git branch: 'main', url: 'https://github.com/sravandevops09/jenkinsdemo.git'
-    }
-}
-
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sravandevops09/jenkinsdemo.git'
+            }
+        }
 
         stage('Initialize Terraform') {
             steps {
