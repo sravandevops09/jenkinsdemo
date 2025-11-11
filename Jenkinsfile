@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')     // Jenkins credentials ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Jenkins credentials ID
+        AWS_ACCESS_KEY_ID     = credentials('AccessKey')     // Jenkins credentials ID
+        AWS_SECRET_ACCESS_KEY = credentials('SecretKey')     // Jenkins credentials ID
     }
 
     stages {
