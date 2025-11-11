@@ -1,54 +1,40 @@
-def installTerraform() {
-    // Check if terraform is already installed
-    def terraformExists = sh(script: 'which terraform', returnStatus: true)
-    if (terraformExists != 0) {
-        // Install terraform
-        sh '''
-            echo "Installing Terraform..."
-            wget https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
-            unzip terraform_1.0.0_linux_amd64.zip
-            sudo mv terraform /usr/local/bin/
-            rm -f terraform_1.0.0_linux_amd64.zip
-        '''
-    } else {
-        echo "Terraform already installed!"
-    }
-}
-
 pipeline {
     agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')     // Jenkins credentials ID
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Jenkins credentials ID
+    }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Pull the git repo
-                cleanWs()
-                checkout scm
+                git 'https://github.com/sravandevops09/jenkinsdemo.git'
             }
         }
 
-        stage('Install Terraform') {
+        stage('Initialize Terraform') {
             steps {
-                script {
-                  installTerraform()
+                sh 'terraform init'
             }
+        }
 
-          }
-	}
-        stage('Terraform Deployment') {
+        stage('Validate Terraform') {
             steps {
-                script {
-                    // CD into deployment folder and run terraform commands
-                    dir('deployment') {
-                        sh '''
-                            terraform init
-                            terraform plan
-                            terraform apply -auto-approve
-                        '''
-                    }
-                }
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Plan Terraform') {
+            steps {
+                sh 'terraform plan -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
+            }
+        }
+
+        stage('Apply Terraform') {
+            steps {
+                sh 'terraform apply -auto-approve -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY"'
             }
         }
     }
 }
-
