@@ -1,47 +1,29 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "us-east-1"
 }
 
-# Fetching the VPC named Application-Vpc
-data "aws_vpc" "selected" {
-  filter {
-    name   = "tag:Name"
-    values = ["project-vpc"]
-  }
-}
-
-data "aws_subnets" "selected" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
-  }
-}
-
-data "aws_ami" "amazon_linux_2" {
+data "aws_ami" "amazon_linux_2023" {
   most_recent = true
-
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["al2023-ami-*-x86_64"]
   }
-
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-
-  owners = ["amazon"] # Amazon's owner ID
+  owners = ["137112412989"]
 }
 
-# Create EC2 instance
-resource "aws_instance" "example" {
-  ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "t2.micro"
-
-  # Using the first subnet from the fetched list
-  subnet_id = tolist(data.aws_subnets.selected.ids)[0]
+resource "aws_instance" "my_ec2" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.micro"
 
   tags = {
-    Name = "MyInstance"
+    Name = "AmazonLinux2023EC2"
   }
+}
+
+output "ami_id_used" {
+  value = data.aws_ami.amazon_linux_2023.id
 }
